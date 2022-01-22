@@ -119,7 +119,9 @@
         const times = JSON.parse(timesJson);
 
         const dateNow = new Date();
-        const activeNow = countInRange(times, dateNow - 1000 * 60 * 5, dateNow) >= 4;
+        const activeNow = countInRange(times,
+            dateNow.valueOf() - 1000 * 60 * 5,
+            dateNow.valueOf()) >= 4;
         const title = activeNow ? (
             '🟢 Active'
         ) : (
@@ -139,7 +141,9 @@
             for (let j = 0; j < 60; j += 15) {
                 const m = j;
                 date.setMinutes(date.getMinutes() + 15);
-                const active = countInRange(times, date - 1000 * 60 * 7.5, date + 1000 * 60 * 7.5);
+                const active = countInRange(times,
+                    date.valueOf() - 1000 * 60 * 7.5,
+                    date.valueOf() + 1000 * 60 * 7.5);
                 myChartData[c++] = active;
             }
         }
