@@ -17,35 +17,21 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    async function run() {
-        const url = 'https://script.google.com/macros/s/AKfycbyvdL2TRKF3LLz3LhLxGGfrjpI_EMjFhdl5MN1OheL2127r5h0qHAfgcPZGhFgY2xOY/exec?z=wapppindenck';
-        const res = await fetch(url);
-        const times = await res.json();
+    let myChart;
+    let myChartData;
+    let lastTimesJson;
 
-        let date = new Date();
-        const fiveMin = 1000 * 60 * 5;
-        const fifteenMin = 1000 * 60 * 15;
-
-        const activeNow = times.filter(x => x > date - fiveMin && x <= date).length >= 4;
-        document.getElementById('status').innerHTML = activeNow ? (
-            '<h1>🟢 Active</h1>'
-        ) : (
-            '<h1>🔴 Inactive</h1>'
-        );
-
+    function init() {
         const labels = [];
-        const labelsData = [];
         for (let i = 5; i < 24 + 5; i++) {
             const h = i % 24;
             for (let j = 0; j < 60; j += 15) {
                 const m = j;
                 labels.push(j > 0 ? '' : h.toString().padStart(2, '0') + ':' + m.toString().padStart(2, '0'));
-
-                date.setHours(h, m, 0, 0);
-                const active = times.filter(x => x > date - fifteenMin && x <= date).length;
-                labelsData.push(active);
             }
         }
+
+        myChartData = [];
 
         const data = {
             labels: labels,
@@ -53,7 +39,7 @@
                 label: 'Pings',
                 backgroundColor: '#78bb7b',
                 borderColor: '#78bb7b',
-                data: labelsData,
+                data: myChartData,
             }]
         };
 
@@ -65,12 +51,52 @@
             },
         };
 
-        const myChart = new Chart(
+        return new Chart(
             document.getElementById('myChart'),
             config,
         );
     }
 
+    async function run() {
+        const url = 'https://script.google.com/macros/s/AKfycbyvdL2TRKF3LLz3LhLxGGfrjpI_EMjFhdl5MN1OheL2127r5h0qHAfgcPZGhFgY2xOY/exec?z=wapppindenck';
+        const res = await fetch(url);
+        const timesJson = await res.text();
+
+        if (timesJson === lastTimesJson) {
+            return;
+        }
+
+        lastTimesJson = timesJson;
+        times = JSON.parse(timesJson);
+
+        const dateNow = new Date();
+        const fiveMin = 1000 * 60 * 5;
+        const fifteenMin = 1000 * 60 * 15;
+
+        myChartData.length = 0;
+        let date = new Date();
+        date.setHours(5, 0, 0, 0);
+        for (let i = 5; i < 24 + 5; i++) {
+            const h = i % 24;
+            for (let j = 0; j < 60; j += 15) {
+                const m = j;
+                date.setMinutes(date.getMinutes() + 15);
+                const active = times.filter(x => x > date - fifteenMin && x <= date).length;
+                myChartData.push(active);
+            }
+        }
+
+        const activeNow = times.filter(x => x > dateNow - fiveMin && x <= dateNow).length >= 4;
+        document.getElementById('status').innerHTML = activeNow ? (
+            '<h1>🟢 Active</h1>'
+        ) : (
+            '<h1>🔴 Inactive</h1>'
+        );
+
+        myChart.update();
+    }
+
+    myChart = init();
     run();
-    setInterval(run, 60);
+    setInterval(run, 1000 * 60);
 </script>
