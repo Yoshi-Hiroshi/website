@@ -25,12 +25,14 @@
     <canvas id="myChart"></canvas>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.2.2/dist/chartjs-plugin-annotation.min.js"></script>
 <script>
 (function () {
     'use strict';
 
     let myChart;
+    let myChartAnnotation;
     let myChartData;
     let lastTimesJson;
 
@@ -56,6 +58,14 @@
     }
 
     function init() {
+        myChartAnnotation = {
+            type: 'line',
+            borderColor: '#717171',
+            borderWidth: 1,
+            scaleID: 'x',
+            value: -1,
+        };
+
         const labels = [];
         for (let i = 5; i < 24 + 5; i++) {
             const h = i % 24;
@@ -87,6 +97,13 @@
                         suggestedMax: 15,
                     },
                 },
+                plugins: {
+                    annotation: {
+                        annotations: {
+                            myChartAnnotation,
+                        },
+                    },
+                },
             },
         };
 
@@ -102,7 +119,7 @@
         const timesJson = await res.text();
         const times = JSON.parse(timesJson);
 
-        const dateNow = Date.now();
+        const dateNow = new Date();
         const activeNow = countInRange(times, dateNow - 1000 * 60 * 5, dateNow) >= 4;
         const title = activeNow ? (
             '🟢 Active'
@@ -133,6 +150,8 @@
                 myChartData.push(active);
             }
         }
+
+        myChartAnnotation.value = (((dateNow.getHours() + 24 - 5) % 24) * 60 + dateNow.getMinutes()) / 15;
 
         myChart.update();
     }
