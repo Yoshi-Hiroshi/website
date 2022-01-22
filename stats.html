@@ -1,0 +1,76 @@
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    #status {
+        color: #717171;
+        text-align: center;
+        margin: 20px 0;
+    }
+</style>
+
+<div id="status"></div>
+<div>
+    <canvas id="myChart" style="height: 300px"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    async function run() {
+        const url = 'https://script.google.com/macros/s/AKfycbyvdL2TRKF3LLz3LhLxGGfrjpI_EMjFhdl5MN1OheL2127r5h0qHAfgcPZGhFgY2xOY/exec?z=wapppindenck';
+        const res = await fetch(url);
+        const times = await res.json();
+
+        let date = new Date();
+        const fiveMin = 1000 * 60 * 5;
+        const fifteenMin = 1000 * 60 * 15;
+
+        const activeNow = times.filter(x => x > date - fiveMin && x <= date).length >= 4;
+        document.getElementById('status').innerHTML = activeNow ? (
+            '<h1>🟢 Active</h1>'
+        ) : (
+            '<h1>🔴 Inactive</h1>'
+        );
+
+        const labels = [];
+        const labelsData = [];
+        for (let i = 5; i < 24 + 5; i++) {
+            const h = i % 24;
+            for (let j = 0; j < 60; j += 15) {
+                const m = j;
+                labels.push(j > 0 ? '' : h.toString().padStart(2, '0') + ':' + m.toString().padStart(2, '0'));
+
+                date.setHours(h, m, 0, 0);
+                const active = times.filter(x => x > date - fifteenMin && x <= date).length;
+                labelsData.push(active);
+            }
+        }
+
+        const data = {
+            labels: labels,
+            datasets: [{
+                label: 'Pings',
+                backgroundColor: '#78bb7b',
+                borderColor: '#78bb7b',
+                data: labelsData,
+            }]
+        };
+
+        const config = {
+            type: 'bar',
+            data: data,
+            options: {
+                maintainAspectRatio: false,
+            },
+        };
+
+        const myChart = new Chart(
+            document.getElementById('myChart'),
+            config,
+        );
+    }
+
+    run();
+    //setInterval(run, 10);
+</script>
