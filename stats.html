@@ -61,17 +61,21 @@
         const url = 'https://script.google.com/macros/s/AKfycbyvdL2TRKF3LLz3LhLxGGfrjpI_EMjFhdl5MN1OheL2127r5h0qHAfgcPZGhFgY2xOY/exec?z=wapppindenck';
         const res = await fetch(url);
         const timesJson = await res.text();
+        const times = JSON.parse(timesJson);
+
+        const dateNow = new Date();
+        const activeNow = times.filter(x => x > dateNow - 1000 * 60 * 5 && x <= dateNow).length >= 4;
+        document.getElementById('status').innerHTML = activeNow ? (
+            '<h1>🟢 Active</h1>'
+        ) : (
+            '<h1>🔴 Inactive</h1>'
+        );
 
         if (timesJson === lastTimesJson) {
             return;
         }
 
         lastTimesJson = timesJson;
-        times = JSON.parse(timesJson);
-
-        const dateNow = new Date();
-        const fiveMin = 1000 * 60 * 5;
-        const fifteenMin = 1000 * 60 * 15;
 
         myChartData.length = 0;
         let date = new Date();
@@ -81,17 +85,10 @@
             for (let j = 0; j < 60; j += 15) {
                 const m = j;
                 date.setMinutes(date.getMinutes() + 15);
-                const active = times.filter(x => x > date - fifteenMin && x <= date).length;
+                const active = times.filter(x => x > date - 1000 * 60 * 15 && x <= date).length;
                 myChartData.push(active);
             }
         }
-
-        const activeNow = times.filter(x => x > dateNow - fiveMin && x <= dateNow).length >= 4;
-        document.getElementById('status').innerHTML = activeNow ? (
-            '<h1>🟢 Active</h1>'
-        ) : (
-            '<h1>🔴 Inactive</h1>'
-        );
 
         myChart.update();
     }
