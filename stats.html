@@ -140,11 +140,11 @@
             const h = i % 24;
             for (let j = 0; j < 60; j += 15) {
                 const m = j;
-                date.setMinutes(date.getMinutes() + 15);
                 const active = countInRange(times,
                     date.valueOf() - 1000 * 60 * 7.5,
                     date.valueOf() + 1000 * 60 * 7.5);
                 myChartData[c++] = active;
+                date.setMinutes(date.getMinutes() + 15);
             }
         }
 
