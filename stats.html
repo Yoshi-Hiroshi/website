@@ -211,7 +211,7 @@
     "org": "Partner Communications Ltd."
 */
 
-        let newDetailsInnerHtml = document.getElementById('details');
+        let moreDetails = '';
         for (const [key, value] of Object.entries(ipApiData)) {
             if (![
                 'ip',
@@ -241,11 +241,11 @@
                 'asn',
                 //'org',  
             ].includes(key) && value) {
-                newDetailsInnerHtml += `${key}: ${value}<br>\n`;
+                moreDetails += `${key}: ${value}<br>\n`;
             }
         }
 
-        document.getElementById('details').innerHTML += newDetailsInnerHtml;
+        document.getElementById('details').innerHTML += moreDetails;
     }
 
     myChart = init();
