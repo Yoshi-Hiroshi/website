@@ -116,8 +116,9 @@
     async function run() {
         const url = 'https://script.google.com/macros/s/AKfycbw6MiAhk_-juIaXqCillk5Ti4vI55nNDMykIJ3QHQEWNGpCKrRRCHOS3h5u5rNAvDvG/exec';
         const res = await fetch(url);
-        const timesJson = await res.text();
-        const times = JSON.parse(timesJson);
+        const dataStr = await res.text();
+        const data = JSON.parse(dataStr);
+        const times = data.accessTimes;
 
         const dateNow = new Date();
         const activeNow = countInRange(times,
