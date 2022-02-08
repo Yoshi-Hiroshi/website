@@ -178,13 +178,69 @@
             Updated: ${prettyDate(lastAccessIp.firstDate)}<br>
         `;
 
-        const ipApiRes = await fetch('https://ip-api.com/json/' + lastAccessIp.ip);
+        const ipApiRes = await fetch('https://ipapi.co/' + lastAccessIp.ip + '/json/');
         const ipApiDataStr = await ipApiRes.text();
         const ipApiData = JSON.parse(ipApiDataStr);
 
+/*
+    "ip": "2a0d:6fc2:5013:c800:6c7a:2294:61f3:6e04",
+    "version": "IPv6",
+    "city": "Tel Aviv",
+    "region": "Tel Aviv",
+    "region_code": "TA",
+    "country": "IL",
+    "country_name": "Israel",
+    "country_code": "IL",
+    "country_code_iso3": "ISR",
+    "country_capital": "Jerusalem",
+    "country_tld": ".il",
+    "continent_code": "AS",
+    "in_eu": false,
+    "postal": null,
+    "latitude": 32.0668,
+    "longitude": 34.7649,
+    "timezone": "Asia/Jerusalem",
+    "utc_offset": "+0200",
+    "country_calling_code": "+972",
+    "currency": "ILS",
+    "currency_name": "Shekel",
+    "languages": "he,ar-IL,en-IL,",
+    "country_area": 20770.0,
+    "country_population": 8883800,
+    "asn": "AS12400",
+    "org": "Partner Communications Ltd."
+*/
+
         let newDetailsInnerHtml = document.getElementById('details');
         for (const [key, value] of Object.entries(ipApiData)) {
-            if (!['query', 'status'].includes(key)) {
+            if (![
+                'ip',
+                'version',
+                //'city',
+                //'region',
+                'region_code',
+                'country',
+                //'country_name',
+                'country_code',
+                'country_code_iso3',
+                'country_capital',
+                'country_tld',
+                'continent_code',
+                'in_eu',
+                //'postal',
+                'latitude',
+                'longitude',
+                'timezone',
+                'utc_offset',
+                'country_calling_code',
+                'currency',
+                'currency_name',
+                'languages',
+                'country_area',
+                'country_population',
+                'asn',
+                //'org',  
+            ].includes(key) && value) {
                 newDetailsInnerHtml += `${key}: ${value}<br>\n`;
             }
         }
