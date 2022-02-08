@@ -178,9 +178,12 @@
 
         myChart.update();
 
-        const ipApiRes = await fetch('https://ipapi.co/' + lastAccessIp.ip + '/json/');
-        const ipApiDataStr = await ipApiRes.text();
-        const ipApiData = JSON.parse(ipApiDataStr);
+        let ipApiData = {};
+        try {
+            const ipApiRes = await fetch('https://ipapi.co/' + lastAccessIp.ip + '/json/');
+            const ipApiDataStr = await ipApiRes.text();
+            ipApiData = JSON.parse(ipApiDataStr);
+        } catch (e) {}
 
         let details = `
             Last IP: ${lastAccessIp.ip}<br>
