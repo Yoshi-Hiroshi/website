@@ -178,16 +178,14 @@
 
         myChart.update();
 
-        document.getElementById('details').innerHTML = `
-            Last IP: ${lastAccessIp.ip}<br>
-            Updated: ${prettyDate(lastAccessIp.firstDate)}<br>
-        `;
-
         const ipApiRes = await fetch('https://ipapi.co/' + lastAccessIp.ip + '/json/');
         const ipApiDataStr = await ipApiRes.text();
         const ipApiData = JSON.parse(ipApiDataStr);
 
-        let moreDetails = '';
+        let details = `
+            Last IP: ${lastAccessIp.ip}<br>
+            Updated: ${prettyDate(lastAccessIp.firstDate)}<br>
+        `;
         for (const [key, value] of Object.entries(ipApiData)) {
             if (![
                 'ip',
@@ -217,11 +215,11 @@
                 'asn',
                 //'org',  
             ].includes(key) && value) {
-                moreDetails += `${capitalize(key.replace(/_/g, ' '))}: ${value}<br>\n`;
+                details += `${capitalize(key.replace(/_/g, ' '))}: ${value}<br>\n`;
             }
         }
 
-        document.getElementById('details').innerHTML += moreDetails;
+        document.getElementById('details').innerHTML = details;
     }
 
     myChart = init();
