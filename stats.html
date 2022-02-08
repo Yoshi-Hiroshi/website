@@ -56,6 +56,11 @@
             diff < 60 && "just now" || diff < 120 && "1 minute ago" || diff < 3600 && Math.floor(diff / 60) + " minutes ago" || diff < 7200 && "1 hour ago" || diff < 86400 && Math.floor(diff / 3600) + " hours ago") || day_diff == 1 && "Yesterday" || day_diff < 7 && day_diff + " days ago" || day_diff < 31 && Math.ceil(day_diff / 7) + " weeks ago";
     }
 
+    // https://stackoverflow.com/a/7224605
+    function capitalize(s) {
+        return s && s[0].toUpperCase() + s.slice(1);
+    }
+
     // https://stackoverflow.com/a/29018745
     function binarySearch(ar, el) {
         let m = 0;
@@ -182,35 +187,6 @@
         const ipApiDataStr = await ipApiRes.text();
         const ipApiData = JSON.parse(ipApiDataStr);
 
-/*
-    "ip": "2a0d:6fc2:5013:c800:6c7a:2294:61f3:6e04",
-    "version": "IPv6",
-    "city": "Tel Aviv",
-    "region": "Tel Aviv",
-    "region_code": "TA",
-    "country": "IL",
-    "country_name": "Israel",
-    "country_code": "IL",
-    "country_code_iso3": "ISR",
-    "country_capital": "Jerusalem",
-    "country_tld": ".il",
-    "continent_code": "AS",
-    "in_eu": false,
-    "postal": null,
-    "latitude": 32.0668,
-    "longitude": 34.7649,
-    "timezone": "Asia/Jerusalem",
-    "utc_offset": "+0200",
-    "country_calling_code": "+972",
-    "currency": "ILS",
-    "currency_name": "Shekel",
-    "languages": "he,ar-IL,en-IL,",
-    "country_area": 20770.0,
-    "country_population": 8883800,
-    "asn": "AS12400",
-    "org": "Partner Communications Ltd."
-*/
-
         let moreDetails = '';
         for (const [key, value] of Object.entries(ipApiData)) {
             if (![
@@ -241,7 +217,7 @@
                 'asn',
                 //'org',  
             ].includes(key) && value) {
-                moreDetails += `${key}: ${value}<br>\n`;
+                moreDetails += `${capitalize(key.replace(/_/g, ' '))}: ${value}<br>\n`;
             }
         }
 
