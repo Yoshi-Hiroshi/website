@@ -178,7 +178,7 @@
             Updated: ${prettyDate(lastAccessIp.firstDate)}<br>
         `;
 
-        const ipApiRes = await fetch('http://ip-api.com/json/' + lastAccessIp.ip);
+        const ipApiRes = await fetch('https://ip-api.com/json/' + lastAccessIp.ip);
         const ipApiDataStr = await ipApiRes.text();
         const ipApiData = JSON.parse(ipApiDataStr);
 
