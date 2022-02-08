@@ -18,6 +18,12 @@
     #myChart {
         height: 300px;
     }
+
+    #details {
+        color: #717171;
+        text-align: center;
+        margin: 20px 0;
+    }
 </style>
 </head>
 <body>
@@ -25,6 +31,7 @@
 <div>
     <canvas id="myChart"></canvas>
 </div>
+<div id="details">...</div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.2.2/dist/chartjs-plugin-annotation.min.js"></script>
@@ -118,10 +125,11 @@
         const res = await fetch(url);
         const dataStr = await res.text();
         const data = JSON.parse(dataStr);
-        const times = data.accessTimes;
+        const accessTimes = data.accessTimes;
+        const lastAccessIp = data.lastAccessIp;
 
         const dateNow = new Date();
-        const activeNow = countInRange(times,
+        const activeNow = countInRange(accessTimes,
             dateNow.valueOf() - 1000 * 60 * 5,
             dateNow.valueOf()) >= 4;
         const title = activeNow ? (
@@ -140,7 +148,7 @@
         let c = 0;
         for (let i = 5; i < 24 + 5; i++) {
             for (let j = 0; j < 60; j += 15) {
-                const active = countInRange(times,
+                const active = countInRange(accessTimes,
                     date.valueOf() - 1000 * 60 * 7.5,
                     date.valueOf() + 1000 * 60 * 7.5);
                 myChartData[c++] = active;
@@ -151,6 +159,11 @@
         myChartAnnotation.value = (((dateNow.getHours() + 24 - 5) % 24) * 60 + dateNow.getMinutes()) / 15;
 
         myChart.update();
+
+        document.getElementById('details').innerHTML = `
+            Last IP: ${lastAccessIp.ip}<br>
+            Updated: ${lastAccessIp.firstDate}<br>
+        `;
     }
 
     myChart = init();
