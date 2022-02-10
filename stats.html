@@ -187,7 +187,8 @@
 
         let details = `
             Last IP: ${lastAccessIp.ip}<br>
-            Updated: ${prettyDate(lastAccessIp.firstDate)}<br>
+            Last update: ${prettyDate(lastAccessIp.lastDate)}<br>
+            Last IP change: ${prettyDate(lastAccessIp.lastDate)}<br>
         `;
         for (const [key, value] of Object.entries(ipApiData)) {
             if (![
