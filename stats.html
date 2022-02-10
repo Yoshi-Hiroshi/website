@@ -15,8 +15,12 @@
         margin: 20px 0;
     }
 
-    #myChart {
+    #my-chart {
         height: 300px;
+    }
+
+    #chart-nav {
+        text-align: center;
     }
 
     #details {
@@ -29,7 +33,12 @@
 <body>
 <h1 id="status">...</h1>
 <div>
-    <canvas id="myChart"></canvas>
+    <canvas id="my-chart"></canvas>
+</div>
+<div id="chart-nav">
+    <button id="chart-nav-back">&lt;</button>
+    <span id="chart-nav-text">Real time</span>
+    <button id="chart-nav-forward">&gt;</button>
 </div>
 <div id="details">...</div>
 
@@ -39,9 +48,11 @@
 (function () {
     'use strict';
 
-    let myChart;
-    let myChartAnnotation;
-    let myChartData;
+    let g_myChart;
+    let g_myChartAnnotation;
+    let g_myChartData;
+    let g_accessTimes;
+    let g_daysBack = 0;
 
     // https://stackoverflow.com/a/7641822
     // Takes an ISO time and returns a string representing how
@@ -83,7 +94,7 @@
     }
 
     function init() {
-        myChartAnnotation = {
+        g_myChartAnnotation = {
             type: 'line',
             borderColor: '#717171',
             borderWidth: 1,
@@ -91,13 +102,13 @@
             value: -1,
         };
 
-        myChartData = [];
+        g_myChartData = [];
         const labels = [];
         for (let i = 5; i < 24 + 5; i++) {
             const h = i % 24;
             for (let j = 0; j < 60; j += 15) {
                 const m = j;
-                myChartData.push(0);
+                g_myChartData.push(0);
                 labels.push(j > 0 ? '' : h.toString().padStart(2, '0') + ':' + m.toString().padStart(2, '0'));
             }
         }
@@ -108,7 +119,7 @@
                 label: 'Pings',
                 backgroundColor: '#78bb7b',
                 borderColor: '#78bb7b',
-                data: myChartData,
+                data: g_myChartData,
             }]
         };
 
@@ -125,7 +136,7 @@
                 plugins: {
                     annotation: {
                         annotations: {
-                            myChartAnnotation,
+                            g_myChartAnnotation,
                         },
                     },
                 },
@@ -133,21 +144,14 @@
         };
 
         return new Chart(
-            document.getElementById('myChart'),
+            document.getElementById('my-chart'),
             config,
         );
     }
 
-    async function run() {
-        const url = 'https://script.google.com/macros/s/AKfycbw6MiAhk_-juIaXqCillk5Ti4vI55nNDMykIJ3QHQEWNGpCKrRRCHOS3h5u5rNAvDvG/exec';
-        const res = await fetch(url);
-        const dataStr = await res.text();
-        const data = JSON.parse(dataStr);
-        const accessTimes = data.accessTimes;
-        const lastAccessIp = data.lastAccessIp;
-
+    function updateActivity() {
         const dateNow = new Date();
-        const activeNow = countInRange(accessTimes,
+        const activeNow = countInRange(g_accessTimes,
             dateNow.valueOf() - 1000 * 60 * 5,
             dateNow.valueOf()) >= 4;
         const title = activeNow ? (
@@ -157,27 +161,32 @@
         );
         document.title = title;
         document.getElementById('status').textContent = title;
+    }
 
+    function updateChart() {
         let date = new Date();
         if (date.getHours() < 5) {
             date.setDate(date.getDate() - 1);
         }
         date.setHours(5, 0, 0, 0);
+        date.setDate(date.getDate() - g_daysBack);
         let c = 0;
         for (let i = 5; i < 24 + 5; i++) {
             for (let j = 0; j < 60; j += 15) {
-                const active = countInRange(accessTimes,
+                const active = countInRange(g_accessTimes,
                     date.valueOf() - 1000 * 60 * 7.5,
                     date.valueOf() + 1000 * 60 * 7.5);
-                myChartData[c++] = active;
+                g_myChartData[c++] = active;
                 date.setMinutes(date.getMinutes() + 15);
             }
         }
 
-        myChartAnnotation.value = (((dateNow.getHours() + 24 - 5) % 24) * 60 + dateNow.getMinutes()) / 15;
+        g_myChartAnnotation.value = (((dateNow.getHours() + 24 - 5) % 24) * 60 + dateNow.getMinutes()) / 15;
 
-        myChart.update();
+        g_myChart.update();
+    }
 
+    async function updateIpInfo(lastAccessIp) {
         let ipApiData = {};
         try {
             const ipApiRes = await fetch('https://ipapi.co/' + lastAccessIp.ip + '/json/');
@@ -188,7 +197,7 @@
         let details = `
             Last IP: ${lastAccessIp.ip}<br>
             Last update: ${prettyDate(lastAccessIp.lastDate)}<br>
-            Last IP change: ${prettyDate(lastAccessIp.lastDate)}<br>
+            Last IP change: ${prettyDate(lastAccessIp.firstDate)}<br>
         `;
         for (const [key, value] of Object.entries(ipApiData)) {
             if (![
@@ -226,9 +235,38 @@
         document.getElementById('details').innerHTML = details;
     }
 
-    myChart = init();
+    async function run() {
+        const url = 'https://script.google.com/macros/s/AKfycbw6MiAhk_-juIaXqCillk5Ti4vI55nNDMykIJ3QHQEWNGpCKrRRCHOS3h5u5rNAvDvG/exec';
+        const res = await fetch(url);
+        const dataStr = await res.text();
+        const data = JSON.parse(dataStr);
+        g_accessTimes = data.accessTimes;
+
+        updateActivity();
+        updateChart();
+        await updateIpInfo(data.lastAccessIp);
+    }
+
+    g_myChart = init();
     run();
     setInterval(run, 1000 * 60);
+
+    function onDaysBackUpdated() {
+        document.getElementById('chart-nav-text').textContent = g_daysBack > 0 ? `${g_daysBack} days ago` : 'Real time';
+        updateChart();
+    }
+
+    document.getElementById('chart-nav-back').onclick = () => {
+        g_daysBack++;
+        onDaysBackUpdated();
+    };
+
+    document.getElementById('chart-nav-forward').onclick = () => {
+        if (g_daysBack > 0) {
+            g_daysBack--;
+            onDaysBackUpdated();
+        }
+    };
 })();
 </script>
 </body>
