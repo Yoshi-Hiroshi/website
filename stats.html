@@ -166,7 +166,11 @@
     function updateChart() {
         let date = new Date();
 
-        g_myChartAnnotation.value = (((date.getHours() + 24 - 5) % 24) * 60 + date.getMinutes()) / 15;
+        if (g_daysBack > 0) {
+            g_myChartAnnotation.value = null;
+        } else {
+            g_myChartAnnotation.value = (((date.getHours() + 24 - 5) % 24) * 60 + date.getMinutes()) / 15;
+        }
 
         if (date.getHours() < 5) {
             date.setDate(date.getDate() - 1);
