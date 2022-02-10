@@ -260,7 +260,7 @@
         if (g_daysBack > 0) {
             const date = new Date();
             date.setDate(date.getDate() - g_daysBack);
-            const dayOfWeek = date.toLocaleString('en-US', { weekday: 'long' });
+            const dayOfWeek = date.toLocaleString('en-US', { weekday: 'long' }).slice(0, 3);
             document.getElementById('chart-nav-text').textContent =
                 `${g_daysBack} days ago (${dayOfWeek})`;
         } else {
