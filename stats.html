@@ -259,7 +259,7 @@
     function onDaysBackUpdated() {
         const date = new Date();
         date.setDate(date.getDate() - g_daysBack);
-        const dayOfWeek = date.toLocaleString('en-us', {  weekday: 'long' });
+        const dayOfWeek = date.toLocaleString('en-US', { weekday: 'long' });
         document.getElementById('chart-nav-text').textContent =
             (g_daysBack > 0 ? `${g_daysBack} days ago` : 'Real time') + ` (${dayOfWeek})`;
         updateChart();
