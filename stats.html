@@ -53,6 +53,7 @@
     let g_myChartData;
     let g_accessTimes;
     let g_daysBack = 0;
+    let g_ipInfoCache = {};
 
     // https://stackoverflow.com/a/7641822
     // Takes an ISO time and returns a string representing how
@@ -193,11 +194,16 @@
 
     async function updateIpInfo(lastAccessIp) {
         let ipApiData = {};
-        try {
-            const ipApiRes = await fetch('https://ipapi.co/' + lastAccessIp.ip + '/json/');
-            const ipApiDataStr = await ipApiRes.text();
-            ipApiData = JSON.parse(ipApiDataStr);
-        } catch (e) {}
+        if (g_ipInfoCache[lastAccessIp.ip]) {
+            ipApiData = g_ipInfoCache[lastAccessIp.ip];
+        } else {
+            try {
+                const ipApiRes = await fetch('https://ipapi.co/' + lastAccessIp.ip + '/json/');
+                const ipApiDataStr = await ipApiRes.text();
+                ipApiData = JSON.parse(ipApiDataStr);
+                g_ipInfoCache[lastAccessIp.ip] = ipApiData;
+            } catch (e) {}
+        }
 
         let details = `
             Last IP: ${lastAccessIp.ip}<br>
