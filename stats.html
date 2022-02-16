@@ -60,6 +60,16 @@
     let g_daysBack = 0;
     let g_ipInfoCache = {};
 
+    // https://stackoverflow.com/a/6234804
+    function escapeHtml(unsafe) {
+        return unsafe
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
     // https://stackoverflow.com/a/7641822
     // Takes an ISO time and returns a string representing how
     // long ago the date represents.
@@ -213,10 +223,10 @@
         }
 
         let details = `
-            Last Wi-Fi SSID: ${lastAccessIp.ssid}<br>
-            Last IP: ${lastAccessIp.ip}<br>
-            Last update: ${prettyDate(lastAccessIp.lastDate)}<br>
-            Last IP/SSID change: ${prettyDate(lastAccessIp.firstDate)}<br>
+            Last Wi-Fi SSID: ${escapeHtml(lastAccessIp.ssid)}<br>
+            Last IP: ${escapeHtml(lastAccessIp.ip)}<br>
+            Last update: ${escapeHtml(prettyDate(lastAccessIp.lastDate))}<br>
+            Last IP/SSID change: ${escapeHtml(prettyDate(lastAccessIp.firstDate))}<br>
         `;
         for (const [key, value] of Object.entries(ipApiData)) {
             if (![
@@ -247,7 +257,7 @@
                 'asn',
                 //'org',  
             ].includes(key) && value) {
-                details += `${capitalize(key.replace(/_/g, ' '))}: ${value}<br>\n`;
+                details += `${escapeHtml(capitalize(key.replace(/_/g, ' ')))}: ${escapeHtml(value)}<br>\n`;
             }
         }
 
