@@ -214,7 +214,7 @@
         g_myChart.update();
     }
 
-    async function updateIpInfo(lastAccessIp) {
+    async function updateIpInfo(lastAccessIp, lastBatteryData) {
         let ipApiData = {};
         if (g_ipInfoCache[lastAccessIp.ip]) {
             ipApiData = g_ipInfoCache[lastAccessIp.ip];
@@ -230,6 +230,7 @@
         }
 
         let details = `
+            Last battery: ${escapeHtml(lastBatteryData.energySource)}${lastBatteryData.batteryPercentage && escapeHtml(` (${lastBatteryData.batteryPercentage}`)}<br>
             Last Wi-Fi SSID: ${escapeHtml(lastAccessIp.ssid)}<br>
             Last IP: ${escapeHtml(lastAccessIp.ip)}<br>
             Last update: ${escapeHtml(prettyDate(lastAccessIp.lastDate))}<br>
@@ -280,7 +281,7 @@
 
         updateActivity();
         updateChart();
-        await updateIpInfo(data.lastAccessIp);
+        await updateIpInfo(data.lastAccessIp, data.lastBatteryData);
     }
 
     g_myChart = init();
