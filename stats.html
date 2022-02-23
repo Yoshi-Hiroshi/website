@@ -230,7 +230,7 @@
         }
 
         let details = `
-            Last battery: ${escapeHtml(lastBatteryData.energySource)}${lastBatteryData.batteryPercentage && escapeHtml(` (${lastBatteryData.batteryPercentage}`%)}<br>
+            Last battery: ${escapeHtml(lastBatteryData.energySource)}${lastBatteryData.batteryPercentage && escapeHtml(` (${lastBatteryData.batteryPercentage}%`)}<br>
             Last Wi-Fi SSID: ${escapeHtml(lastAccessIp.ssid)}<br>
             Last IP: ${escapeHtml(lastAccessIp.ip)}<br>
             Last update: ${escapeHtml(prettyDate(lastAccessIp.lastDate))}<br>
