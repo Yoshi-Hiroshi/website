@@ -216,17 +216,19 @@
 
     async function updateIpInfo(lastAccessIp, lastBatteryData) {
         let ipApiData = {};
-        if (g_ipInfoCache[lastAccessIp.ip]) {
-            ipApiData = g_ipInfoCache[lastAccessIp.ip];
-        } else {
-            try {
-                const ipApiRes = await fetch('https://ipapi.co/' + lastAccessIp.ip + '/json/');
-                const ipApiDataStr = await ipApiRes.text();
-                ipApiData = JSON.parse(ipApiDataStr);
-                if (!ipApiData.error) {
-                    g_ipInfoCache[lastAccessIp.ip] = ipApiData;
-                }
-            } catch (e) {}
+        if (lastAccessIp.ip) {
+            if (g_ipInfoCache[lastAccessIp.ip]) {
+                ipApiData = g_ipInfoCache[lastAccessIp.ip];
+            } else {
+                try {
+                    const ipApiRes = await fetch('https://ipapi.co/' + lastAccessIp.ip + '/json/');
+                    const ipApiDataStr = await ipApiRes.text();
+                    ipApiData = JSON.parse(ipApiDataStr);
+                    if (!ipApiData.error) {
+                        g_ipInfoCache[lastAccessIp.ip] = ipApiData;
+                    }
+                } catch (e) { }
+            }
         }
 
         let details = `
