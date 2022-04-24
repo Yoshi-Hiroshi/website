@@ -45,7 +45,7 @@
     <span id="chart-nav-text">Real time</span>
     <button id="chart-nav-forward">&gt;</button>
 </div>
-<div id="details">...</div>
+<!-- <div id="details">...</div> -->
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.2.2/dist/chartjs-plugin-annotation.min.js"></script>
@@ -214,7 +214,7 @@
         g_myChart.update();
     }
 
-    async function updateIpInfo(lastAccessIp, lastBatteryData) {
+    /*async function updateIpInfo(lastAccessIp, lastBatteryData) {
         let ipApiData = {};
         if (lastAccessIp.ip) {
             if (g_ipInfoCache[lastAccessIp.ip]) {
@@ -272,7 +272,7 @@
         }
 
         document.getElementById('details').innerHTML = details;
-    }
+    }*/
 
     async function run() {
         const url = 'https://script.google.com/macros/s/AKfycbw6MiAhk_-juIaXqCillk5Ti4vI55nNDMykIJ3QHQEWNGpCKrRRCHOS3h5u5rNAvDvG/exec';
@@ -283,7 +283,7 @@
 
         updateActivity();
         updateChart();
-        await updateIpInfo(data.lastAccessIp, data.lastBatteryData);
+        //await updateIpInfo(data.lastAccessIp, data.lastBatteryData);
     }
 
     g_myChart = init();
