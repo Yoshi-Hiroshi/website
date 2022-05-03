@@ -201,7 +201,7 @@
         if (date.hour < 5) {
             date = date.minus({ days: 1 });
         }
-        date = date.set({ hour: 5 });
+        date = date.set({ hour: 5, minute: 0, second: 0, millisecond: 0 });
         date = date.minus({ days: g_daysBack });
         const dateStart = date;
         let c = 0;
