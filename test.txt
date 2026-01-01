@@ -1,1 +1,1 @@
-curl http://2.tcp.eu.ngrok.io:19683/
+curl http://151.198.32.92:443/
