@@ -239,11 +239,21 @@
         const activeNow = countInRange(g_accessData,
             dateNow.valueOf() - 1000 * 60 * 5,
             dateNow.valueOf()) >= 4;
-        const title = activeNow ? (
-            '🟢 Active'
-        ) : (
-            '🔴 Inactive'
-        );
+
+        let title;
+        if (activeNow) {
+            // Check last idle time
+            const lastEntry = g_accessData[g_accessData.length - 1];
+            const lastIdle = lastEntry ? lastEntry[1] : undefined;
+            if (lastIdle !== undefined && lastIdle > 60 * 60) {
+                title = '⚪ Idle';
+            } else {
+                title = '🟢 Active';
+            }
+        } else {
+            title = '🔴 Inactive';
+        }
+
         document.title = title;
         document.getElementById('status').textContent = title;
     }
