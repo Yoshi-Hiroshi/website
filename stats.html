@@ -126,22 +126,27 @@
         return data.map(item => Array.isArray(item) ? item : [item, undefined]);
     }
 
-    // Get minimum idle time (seconds) for entries in range, skipping undefined
-    function getMinIdleInRange(ar, from, to) {
+    // Get min and max idle time (seconds) for entries in range, skipping undefined
+    function getIdleRangeInRange(ar, from, to) {
         const startIdx = binarySearch(ar, from);
         const endIdx = binarySearch(ar, to);
         if (startIdx >= endIdx) return undefined;
 
         let minIdle = undefined;
+        let maxIdle = undefined;
         for (let i = startIdx; i < endIdx; i++) {
             if (ar[i][1] !== undefined) {
                 const idle = ar[i][1];
                 if (minIdle === undefined || idle < minIdle) {
                     minIdle = idle;
                 }
+                if (maxIdle === undefined || idle > maxIdle) {
+                    maxIdle = idle;
+                }
             }
         }
-        return minIdle;
+        if (minIdle === undefined) return undefined;
+        return { min: minIdle, max: maxIdle };
     }
 
     // Convert idle time (seconds) to color - green (active) to gray (idle)
@@ -165,7 +170,7 @@
         return `${seconds}s`;
     }
 
-    let g_minIdleTimes = [];
+    let g_idleRanges = [];
 
     function init() {
         g_myChartAnnotation = {
@@ -184,7 +189,7 @@
             for (let j = 0; j < 60; j += 15) {
                 g_myChartData.push(0);
                 g_myChartColors.push('#78bb7b');
-                g_minIdleTimes.push(undefined);
+                g_idleRanges.push(undefined);
                 labels.push(h.toString().padStart(2, '0') + ':' + j.toString().padStart(2, '0'));
             }
         }
@@ -216,9 +221,12 @@
                     tooltip: {
                         callbacks: {
                             afterLabel: function(context) {
-                                const idle = g_minIdleTimes[context.dataIndex];
-                                if (idle !== undefined) {
-                                    return 'Min idle: ' + formatIdleTime(idle);
+                                const idleRange = g_idleRanges[context.dataIndex];
+                                if (idleRange !== undefined) {
+                                    if (idleRange.min === idleRange.max) {
+                                        return 'Idle: ' + formatIdleTime(idleRange.min);
+                                    }
+                                    return 'Idle: ' + formatIdleTime(idleRange.min) + '-' + formatIdleTime(idleRange.max);
                                 }
                                 return '';
                             }
@@ -278,10 +286,10 @@
             const from = date.valueOf() - 1000 * 60 * 7.5;
             const to = date.valueOf() + 1000 * 60 * 7.5;
             const count = countInRange(g_accessData, from, to);
-            const minIdle = getMinIdleInRange(g_accessData, from, to);
+            const idleRange = getIdleRangeInRange(g_accessData, from, to);
             g_myChartData[c] = count;
-            g_myChartColors[c] = idleTimeToColor(minIdle);
-            g_minIdleTimes[c] = minIdle;
+            g_myChartColors[c] = idleTimeToColor(idleRange ? idleRange.min : undefined);
+            g_idleRanges[c] = idleRange;
             date = date.plus({ minutes: 15 });
         }
 
