@@ -152,8 +152,8 @@
     // Convert idle time (seconds) to color - green (active) to gray (idle)
     function idleTimeToColor(idleSec) {
         if (idleSec === undefined) return '#78bb7b';
-        // 0 idle = full green (#78bb7b), 30 min idle = gray (#a0a0a0)
-        const t = Math.min(idleSec / (30 * 60), 1);
+        // 0 idle = full green (#78bb7b), 60 min idle = gray (#a0a0a0)
+        const t = Math.min(idleSec / (60 * 60), 1);
         const r = Math.round(0x78 + (0xa0 - 0x78) * t);
         const g = Math.round(0xbb + (0xa0 - 0xbb) * t);
         const b = Math.round(0x7b + (0xa0 - 0x7b) * t);
